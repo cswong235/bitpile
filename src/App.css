@@ -1,9 +1,15 @@
 body {
   overflow-x: hidden;
+  background: linear-gradient(to top, white, white, white, rgba(227, 255, 223, 0.849));
+  background-repeat: no-repeat;
 }
 
-.bg-green{
-    background-color: rgb(26, 129, 26);
+.font-game{
+    font-family: 'Boldonse';
+}
+
+.bg-green, .btn-green{
+    background-color: rgb(143, 255, 143);
 }
 
 .hover{

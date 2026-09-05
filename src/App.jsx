@@ -1,5 +1,6 @@
 import logo from './assets/BitPile.png';
 import platformIcon from './assets/controller-svgrepo-com.svg';
+import genreIcon from './assets/module-management-svgrepo-com.svg';
 import NoImage from './assets/NoImage.png';
 import Carousel from 'react-bootstrap/Carousel';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -12,7 +13,7 @@ function Filters({updateFilters}){
   const [genre, setGenre] = useState('Any');
 
   // Platforms and genres for selection
-  const platforms = ['Any', 'PS4', 'PS5', 'PC', 'Nintendo Switch', 'Xbox 360'];
+  const platforms = ['Any', 'PS4', 'PS5', 'PC', 'Nintendo Switch', 'Xbox', 'Android', 'iOS'];
   const genres = ['Any', 'First-Person Shooter', 'Third-Person Shooter', 'RPG', 'Roguelike', 'Fighting', 'Horror', 'Exploration'];
   const ratings = ['Any', 1, 2, 3, 4, 5];
 
@@ -29,8 +30,8 @@ function Filters({updateFilters}){
 
   return(
     <>
-      <div className="container shadow rounded-3 mt-5 p-4 mb-5">
-        <h3 className="mb-4">Filters</h3>
+      <div className="container shadow rounded-3 mt-5 p-4 mb-5 bg-white">
+        <h3 className="mb-4 font-game">Filters</h3>
         <hr></hr>
         <form onSubmit={handleSubmit}>
           <div className="row mb-3">
@@ -83,7 +84,7 @@ function Filters({updateFilters}){
               </label>
             </div>
           </div>
-          <button className="btn btn-primary" onClick={() => {updateFilters}}>Update Filters</button>
+          <button className="border btn btn-green" onClick={() => {updateFilters}}>Update Filters</button>
         </form>
       </div>
     </>
@@ -154,10 +155,14 @@ function GameList({games}){
                       className="w-100 mt-3 border rounded-4"
                       style={{ height: '200px', objectFit: 'cover' }}
                     />
-                    <div className="d-flex flex-row align-items-center justify-content-center gap-3">
-                      <h2 className="mt-2 m-0">{game?.name ?? '-'}</h2>
-                      <span className="rounded-5 bg-success p-1 ps-3 pe-3 mt-2 m-0 text-white">{game?.genre ?? '-'}</span>
+                    <div className="d-flex flex-row align-items-center gap-3 font-game pt-2 pb-2 ps-2">
+                      <h3 className="mt-2 m-0">{game?.name ?? '-'}</h3>
                     </div>
+                    <hr/>
+                    <span className='d-flex m-0 gap-2 mb-1'>
+                      <img src={genreIcon} alt='Genre icon' width='30px' className='mr-4'/>
+                      {game?.genre?.length ? game.genre.join(', ') : '-'}
+                    </span>
                     <span className='d-flex m-0 gap-2'>
                       <img src={platformIcon} alt='Platform icon' width='30px' className='mr-4'/>
                       {game?.platform?.length ? game.platform.join(', ') : '-'}
@@ -171,8 +176,8 @@ function GameList({games}){
           ))
         : <Carousel.Item>
             <div className="container text-center">
-              <h1 className="text-white">No games yet!</h1>
-              <h3 className="text-white">Add your favourite games here.</h3>
+              <h1 className="font-game mb-4">No games yet!</h1>
+              <h3>Add your favourite games here.</h3>
             </div>
           </Carousel.Item>
         }
@@ -191,7 +196,7 @@ function AddGame({insertGame}){
   const [genre, setGenre] = useState([]);
 
   // Platforms and genres for selection
-  const platforms = ['PS4', 'PS5', 'PC', 'Nintendo Switch', 'Xbox 360'];
+  const platforms = ['PS4', 'PS5', 'PC', 'Nintendo Switch', 'Xbox', 'Android', 'iOS'];
   const genres = ['First-Person Shooter', 'Third-Person Shooter', 'RPG', 'Roguelike', 'Fighting', 'Horror', 'Exploration'];
 
   // Toggles values in a multi-select array
@@ -214,34 +219,44 @@ function AddGame({insertGame}){
     // Prevents the form from refreshing the page
     event.preventDefault();
     // Initialize object to hold all the input values
-    const gameObject = {
-      name: name,
-      platform: platform,
-      genre: genre,
-      rating: rating,
-      description: description,
-      image: image,
-    }
+    if(rating <= 0 || rating >= 6){
+      alert('Please enter a valid rating from 1 to 5.');
+    }else if(!name){
+      alert('Please enter a name.');
+    }else if(genre.length <= 0 ){
+      alert('Please select at least one genre.');
+    }else if(platform.length <= 0){
+      alert('Please select at least one platform.');
+    }else{
+      const gameObject = {
+        name: name,
+        platform: platform,
+        genre: genre,
+        rating: rating,
+        description: description,
+        image: image,
+      }
 
-    // Call insertGame from the App component
-    // Because that the App calling the AddGame component via <AddGame insertGame={insertGame}/>
-    // It passed the insertGame prop with the "insertGame" function
-    // So that's why the AddGame component can reach the insertGame function from App
-    insertGame(gameObject);
+      // Call insertGame from the App component
+      // Because that the App calling the AddGame component via <AddGame insertGame={insertGame}/>
+      // It passed the insertGame prop with the "insertGame" function
+      // So that's why the AddGame component can reach the insertGame function from App
+      insertGame(gameObject);
+    }
   }
 
   return(
     <>
-      <h1 className="mb-4">Add Game</h1>
+      <h1 className="mb-4 font-game">Add Game</h1>
       <form onSubmit={handleSubmit}>
         <div className="row mb-3">
           <div className="col-md-4">
-            <label className="form-label d-block">Game Name
+            <label className="form-label d-block">Game Name<span className="text-danger"> *</span>
               <input type="text" className="form-control" placeholder="Name" value={name} onChange={(event) => (setName(event.target.value))}></input>
             </label>
           </div>
           <div className="col-md-4">
-            <label className="form-label d-block">Platform
+            <label className="form-label d-block">Platform<span className="text-danger"> *</span>
               <Dropdown>
                 <Dropdown.Toggle className="bg-white border text-muted form-select text-start">
                   {platform.length ? platform.join(', ') : 'Select platforms'}
@@ -258,7 +273,7 @@ function AddGame({insertGame}){
             </label>
           </div>
           <div className="col-md-4">
-            <label className="form-label d-block">Genre
+            <label className="form-label d-block">Genre<span className="text-danger"> *</span>
               <Dropdown>
                 <Dropdown.Toggle className="bg-white border text-muted form-select text-start">
                   {genre.length ? genre.join(', ') : 'Select genres'}
@@ -277,7 +292,7 @@ function AddGame({insertGame}){
         </div>
         <div className="row mb-3">
           <div className="col-md-4">
-            <label className="form-label d-block">Rating
+            <label className="form-label d-block">Rating (1 - 5)<span className="text-danger"> *</span>
               <input type="number" className="form-control" placeholder="Rating" value={rating} onChange={(event) => (setRating(event.target.value))}></input>
             </label>
           </div>
@@ -292,15 +307,19 @@ function AddGame({insertGame}){
             </label>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={() => {insertGame}}>Add Game</button>
+        <button className="btn btn-green" onClick={() => {insertGame}}>Add Game</button>
       </form>
     </>
   )
 }
 
 function App(){
-  const [games, setGames] = useState([]);
-  const [gameCount, setGameCount] = useState(0);
+  const [games, setGames] = useState([
+    {name: 'Destiny 2', platform: ['PC', 'PS4', 'PS5', 'Xbox'], genre: ['First-Person Shooter', 'RPG'], rating: 5, description: 'Explore the mysteries of Sol and experience exhilirating first-person shooter combat in Destiny 2. Unlock powerful abilities and collect unique gear across story missions, co-op, and PvP modes.', image: 'https://upload.wikimedia.org/wikipedia/en/0/05/Destiny_2_%28artwork%29.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original'},
+    {name: 'Warframe', platform: ['PC', 'PS4', 'PS5', 'iOS', 'Android', 'Xbox'], genre: ['Third-Person Shooter', 'RPG'], rating: 4, description: `Join the Tenno and defend an ever-expanding universe. Wield your Warframe's tactical abilities, craft a loadout of devastating weaponry and define your path.`, image: 'https://upload.wikimedia.org/wikipedia/en/b/bd/Warframe_Cover_Art.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original'},
+    {name: 'Helldivers 2', platform: ['PC', 'Xbox', 'PS5'], genre: ['Third-Person Shooter'], rating: 4, description: `The Galaxy’s Last Line of Offence. Enlist in the Helldivers and join the fight for freedom across a hostile galaxy in a fast, frantic, and ferocious third-person shooter.`, image: 'https://helldivers.wiki.gg/images/thumb/Helldivers_2_Key_Art_2x3.png/800px-Helldivers_2_Key_Art_2x3.png?21106d'},
+  ]);
+  const [gameCount, setGameCount] = useState(games.length);
   // Holds the currently selected filter criteria
   const [filters, setFilters] = useState({ platform: 'Any', genre: 'Any', rating: 'Any' });
 
@@ -313,7 +332,7 @@ function App(){
   function insertGame(gameObject){
     setGames([...games, gameObject]);
     incrementGameCount();
-    console.log(games);
+    alert('Added a game successfully!');
   }
 
   // Stores whatever criteria the Filters form last submitted as an object
@@ -322,25 +341,37 @@ function App(){
   }
 
   // Render the filtered array of games
+  // Reads from the current state of filters and check if each game from the "games" useState matches the filters
   function getFilteredGames(){
     return games.filter((game) => {
+      // .filter method only keeps games with the same property value as the filters in the new array
+      // Or the match just straight up returns true when 'Any' is active without additional conditions
+
+      // Checks if each game in the "games" state has a platform value matching the filter, or skip if 'Any'
       const platformMatch = filters.platform === 'Any' || game.platform.includes(filters.platform);
+
+      // Checks if each game in the "games" state has a genre value matching the filter, or skip if 'Any'
       const genreMatch = filters.genre === 'Any' || game.genre.includes(filters.genre);
+
+      // Checks if each game in the "games" state has a rating value matching the filter, or skip if 'Any'
       const ratingMatch = filters.rating === 'Any' || game.rating == filters.rating;
-      console.log(`${platformMatch}, ${genreMatch}, ${ratingMatch}`)
+
+      // Return each game that has passed all three checks as true or false
       return platformMatch && genreMatch && ratingMatch;
     });
+    // After filtering, what remains is a new array with only the filtered games
+    // This gets passed to GameList to be rendered out
   }
 
   return(
     <>
-      <header className="p-3 shadow">
+      <header className="p-3 shadow w-25 rounded-top rounded-end-5 bg-white">
         <img src={logo} alt="BitPile logo" width="250px"/>
       </header>
       <Filters updateFilters={updateFilters}/>
       <div className="d-flex flex-row align-items-center">
-        <h1 className="p-3">Game Collection</h1>
-        <span className="border p-2 rounded-5"><img src={platformIcon} alt='Platform icon' width='30px' className="p-1"/><strong>{gameCount}</strong> games</span>
+        <h1 className="p-3 font-game">Game Collection</h1>
+        <span className="border p-2 rounded-5 bg-white"><img src={platformIcon} alt='Platform icon' width='30px' className="p-1"/><strong>{gameCount}</strong> games</span>
       </div>
       <div className="container" style={{ maxWidth: '2000px' }}>
         <GameList games={getFilteredGames()}/>
