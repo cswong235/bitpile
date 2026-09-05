@@ -141,7 +141,7 @@ function GameList({games}){
 
   return(
     <>
-      <Carousel className="bg-green p-5 rounded-5">
+      <Carousel key={gameGroups.length} className="bg-green p-5 rounded-5">
         {/* Check if the games array has at least one entry, if so, display cards, if not, display message */}
         {gameGroups.length ?
           gameGroups.map((group, groupIndex) => (
